@@ -6,6 +6,7 @@ use std::io::BufReader;
 use std::path::Path;
 use serde_xml_rs::from_reader;
 use libflate::gzip;
+use zip;
 use std::io::Read;
 
 pub fn parse(path: &Path) -> Result<aggregate_report::feedback, Box<std::error::Error>> {
@@ -22,10 +23,16 @@ pub fn parse(path: &Path) -> Result<aggregate_report::feedback, Box<std::error::
                     let mut reader = get_file_reader(&path)?;
                     return parse_reader(&mut reader);
                 },
-                "gz" => {
+                "gz" | "gzip" => {
                     let reader = get_file_reader(&path)?;
                     let mut decoder = gzip::Decoder::new(reader)?;
                     return parse_reader(&mut decoder);
+                },
+                "zip" => {
+                    let file = File::open(&path)?;
+                    let mut archive = zip::ZipArchive::new(file)?;
+                    let mut file = archive.by_index(0)?;
+                    return parse_reader(&mut file);
                 },
                 _       => {
                     let error_message = format!("Do not know how to handle {} files :-(", extension.to_str().unwrap());
