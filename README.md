@@ -5,4 +5,4 @@ It also allows parsing gzip'ed and zip'ed DMARC reports. In addition to allowing
 
 This is written in Rust which should mean that it will be relatively fast and memory safe.
 
-I apologize for the lack of cosumentation, but this is very much a work in progress.
+I apologize for the lack of documentation, but this is very much a work in progress.
