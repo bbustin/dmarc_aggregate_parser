@@ -6,6 +6,7 @@ edition = "2018"
 description = "Simple library to parse email DMARC reports"
 repository = "https://github.com/bbustin/dmarc_aggregate_parser"
 readme = "README.md"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
