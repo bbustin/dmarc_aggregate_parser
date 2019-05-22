@@ -1,7 +1,7 @@
 [package]
 name = "dmarc_aggregate_parser"
-version = "0.1.0"
-authors = ["Brian Bustin <brian@bustin.us>"]
+version = "0.1.1"
+authors = ["Brian Bustin"]
 edition = "2018"
 description = "Simple library to parse email DMARC reports"
 repository = "https://github.com/bbustin/dmarc_aggregate_parser"
