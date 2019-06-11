@@ -85,7 +85,7 @@ mod tests {
     use super::*;
     #[test]
     fn test_parse_single() {
-        parse("dmarc.xml");
+        parse(Path::new("dmarc.xml"));
     }
 
     #[test]
