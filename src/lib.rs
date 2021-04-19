@@ -54,7 +54,7 @@ fn get_file_reader(path: &Path) -> Result<BufReader<File>, Box<std::error::Error
     Ok(BufReader::new(file))
 }
 
-fn parse_reader(reader: &mut Read) -> Result<aggregate_report::feedback, Box<std::error::Error>> {
+pub fn parse_reader(reader: &mut Read) -> Result<aggregate_report::feedback, Box<std::error::Error>> {
     match from_reader(reader) {
         Ok(result) => Ok(result),
         Err(error) => Err(error.into())
