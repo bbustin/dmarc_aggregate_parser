@@ -10,6 +10,6 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
-serde-xml-rs = "0.3"
+serde-xml-rs = "0.4"
 libflate = "0.1"
 zip = "0.5"

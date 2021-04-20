@@ -5,7 +5,7 @@
 // had to make certain fields optional even though the spec says they are not.
 // Also had to make the version field a String.
 // Guess the spec is not being followed to a T.
-use std::net::Ipv4Addr;
+use std::net::IpAddr;
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -84,7 +84,7 @@ pub struct PolicyEvaluatedType {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RowType {
-    pub source_ip:          Ipv4Addr,
+    pub source_ip:          IpAddr,
     pub count:              u32,
     pub policy_evaluated:   PolicyEvaluatedType
 }
