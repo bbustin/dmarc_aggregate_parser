@@ -9,9 +9,9 @@ use libflate::gzip;
 use zip;
 use std::io::Read;
 
-pub fn parse(path: &Path) -> Result<aggregate_report::feedback, Box<std::error::Error>> {
+pub fn parse(path: &Path) -> Result<aggregate_report::feedback, Box<dyn std::error::Error>> {
     if path.is_dir() {
-        panic!("{} is a directory")
+        panic!("path is a directory")
     }
 
     let extension = path.extension();
@@ -49,12 +49,12 @@ pub fn parse(path: &Path) -> Result<aggregate_report::feedback, Box<std::error::
     parse_reader(&mut file)
 }
 
-fn get_file_reader(path: &Path) -> Result<BufReader<File>, Box<std::error::Error>> {
+fn get_file_reader(path: &Path) -> Result<BufReader<File>, Box<dyn std::error::Error>> {
     let file = File::open(&path)?;
     Ok(BufReader::new(file))
 }
 
-pub fn parse_reader(reader: &mut Read) -> Result<aggregate_report::feedback, Box<std::error::Error>> {
+pub fn parse_reader(reader: &mut dyn Read) -> Result<aggregate_report::feedback, Box<dyn std::error::Error>> {
     match from_reader(reader) {
         Ok(result) => Ok(result),
         Err(error) => Err(error.into())
