@@ -13,3 +13,4 @@ serde = { version = "1.0", features = ["derive"] }
 serde-xml-rs = "0.4"
 libflate = "0.1"
 zip = "0.5"
+thiserror = "1.0.37"

@@ -1,14 +1,16 @@
 #![deny(missing_debug_implementations)]
 pub mod aggregate_report;
+pub mod error_handling;
+use error_handling::ParsingError;
 
-use std::fs::{File, read_dir};
-use std::io::BufReader;
-use std::path::Path;
-use serde_xml_rs::from_reader;
 use libflate::gzip;
+use serde_xml_rs::from_reader;
+use std::fs::{read_dir, File};
+use std::io::BufReader;
 use std::io::Read;
+use std::path::Path;
 
-pub fn parse(path: &Path) -> Result<aggregate_report::feedback, Box<dyn std::error::Error>> {
+pub fn parse(path: &Path) -> Result<aggregate_report::feedback, ParsingError> {
     if path.is_dir() {
         panic!("path is a directory")
     }
@@ -16,25 +18,25 @@ pub fn parse(path: &Path) -> Result<aggregate_report::feedback, Box<dyn std::err
     let extension = path.extension();
 
     if let Some(extension) = extension {
-        match extension.to_str().unwrap() {
-            "xml" => {
+        match extension.to_str() {
+            Some("xml") => {
                 let mut reader = get_file_reader(path)?;
                 return parse_reader(&mut reader);
-            },
-            "gz" | "gzip" => {
+            }
+            Some("gz") | Some("gzip") => {
                 let reader = get_file_reader(path)?;
                 let mut decoder = gzip::Decoder::new(reader)?;
                 return parse_reader(&mut decoder);
-            },
-            "zip" => {
+            }
+            Some("zip") => {
                 let file = File::open(path)?;
                 let mut archive = zip::ZipArchive::new(file)?;
                 let mut file = archive.by_index(0)?;
                 return parse_reader(&mut file);
-            },
-            _       => {
-                let error_message = format!("Do not know how to handle {} files :-(", extension.to_str().unwrap());
-                return Err(error_message.into());
+            }
+            _ => {
+                let extension = extension.to_str().unwrap_or("").into();
+                return Err(ParsingError::UnknownFile { extension });
             }
         }
     }
@@ -45,18 +47,21 @@ pub fn parse(path: &Path) -> Result<aggregate_report::feedback, Box<dyn std::err
     parse_reader(&mut file)
 }
 
-fn get_file_reader(path: &Path) -> Result<BufReader<File>, Box<dyn std::error::Error>> {
+fn get_file_reader(path: &Path) -> Result<BufReader<File>, ParsingError> {
     let file = File::open(path)?;
     Ok(BufReader::new(file))
 }
 
-pub fn parse_reader(reader: &mut dyn Read) -> Result<aggregate_report::feedback, Box<dyn std::error::Error>> {
+pub fn parse_reader(reader: &mut dyn Read) -> Result<aggregate_report::feedback, ParsingError> {
     match from_reader(reader) {
         Ok(result) => Ok(result),
-        Err(error) => Err(error.into())
+        Err(error) => Err(error.into()),
     }
 }
 
+/// This will panic if any of the files are not readable
+/// and will only print an error on the stderr if parsing 
+/// of any specific file fails. Use parse for better error handling
 pub fn parse_dir(path: &Path) -> Vec<aggregate_report::feedback> {
     let mut results = Vec::new();
 
@@ -68,11 +73,10 @@ pub fn parse_dir(path: &Path) -> Vec<aggregate_report::feedback> {
             let result = parse(&path);
             match result {
                 Ok(result) => results.push(result),
-                Err(error) => println!("could not parse: {:?} because {:?}", path, error)
+                Err(error) => eprintln!("could not parse: {:?} because {:?}", path, error),
             }
         }
     }
-    
     results
 }
 
