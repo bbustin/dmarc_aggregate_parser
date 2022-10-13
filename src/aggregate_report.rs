@@ -8,13 +8,13 @@
 use std::net::IpAddr;
 use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DateRangeType {
     pub begin:  u32,
     pub end:    u32
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ReportMetadataType {
     pub org_name:           String,
     pub email:              String,
@@ -25,21 +25,21 @@ pub struct ReportMetadataType {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum AlignmentType {
     r,
     s
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum DispositionType {
     none,
     quarantine,
     reject
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PolicyPublishedType {
     pub domain:     String,
     pub adkim:      Option<AlignmentType>,
@@ -51,14 +51,14 @@ pub struct PolicyPublishedType {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum DMARCResultType {
     pass,
     fail
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum PolicyOverrideType {
     forwarded,
     sampled_out,
@@ -68,13 +68,13 @@ pub enum PolicyOverrideType {
     other
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PolicyOverrideReason {
     pub r#type:     PolicyOverrideType,
     pub comment:    Option<String>
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PolicyEvaluatedType {
     pub disposition:    DispositionType,
     pub dkim:           Option<DMARCResultType>,
@@ -82,14 +82,14 @@ pub struct PolicyEvaluatedType {
     pub reason:         Option<Vec<PolicyOverrideReason>>
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct RowType {
     pub source_ip:          IpAddr,
     pub count:              u32,
     pub policy_evaluated:   PolicyEvaluatedType
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct IdentifierType {
     pub envelope_to:    Option<String>,
     pub envelope_from:  Option<String>,
@@ -97,7 +97,7 @@ pub struct IdentifierType {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum DKIMResultType {
     none,
     pass,
@@ -108,7 +108,7 @@ pub enum DKIMResultType {
     permerror
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DKIMAuthResultType {
     pub domain:         String,
     pub selector:       Option<String>,
@@ -117,14 +117,14 @@ pub struct DKIMAuthResultType {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum SPFDomainScope {
     helo,
     mfrom
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum SPFResultType {
     none,
     neutral,
@@ -135,20 +135,20 @@ pub enum SPFResultType {
     permerror
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SPFAuthResultType {
     pub domain: String,
     pub scope:  Option<SPFDomainScope>,
     pub result: SPFResultType
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AuthResultType {
     pub dkim:   Option<Vec<DKIMAuthResultType>>,
     pub spf:    Vec<SPFAuthResultType>
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct RecordType {
     pub row:            RowType,
     pub identifiers:    IdentifierType,
@@ -156,7 +156,7 @@ pub struct RecordType {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct feedback {
     pub version:            Option<String>,
     pub report_metadata:    ReportMetadataType,
