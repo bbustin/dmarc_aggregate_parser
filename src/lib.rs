@@ -10,7 +10,9 @@ use std::io::BufReader;
 use std::io::Read;
 use std::path::Path;
 
-pub fn parse<T: std::convert::AsRef<std::ffi::OsStr>>(path: T) -> Result<aggregate_report::feedback, ParsingError> {
+pub fn parse<T: std::convert::AsRef<std::ffi::OsStr>>(
+    path: T,
+) -> Result<aggregate_report::feedback, ParsingError> {
     let path = std::path::Path::new(&path);
     if path.is_dir() {
         panic!("path is a directory")
@@ -61,7 +63,7 @@ pub fn parse_reader(reader: &mut dyn Read) -> Result<aggregate_report::feedback,
 }
 
 /// This will panic if any of the files are not readable
-/// and will only print an error on the stderr if parsing 
+/// and will only print an error on the stderr if parsing
 /// of any specific file fails. Use parse for better error handling
 pub fn parse_dir(path: &Path) -> Vec<aggregate_report::feedback> {
     let mut results = Vec::new();
@@ -90,6 +92,7 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
     fn test_parse_dir() {
         parse_dir(Path::new("./"));
     }
