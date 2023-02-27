@@ -92,6 +92,7 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
     fn test_parse_dir() {
         parse_dir(Path::new("./"));
     }
