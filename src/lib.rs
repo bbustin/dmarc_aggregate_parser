@@ -15,7 +15,7 @@ pub fn parse<T: std::convert::AsRef<std::ffi::OsStr>>(
 ) -> Result<aggregate_report::feedback, ParsingError> {
     let path = std::path::Path::new(&path);
     if path.is_dir() {
-        panic!("path is a directory")
+        return Err(ParsingError::ParseDirectory);
     }
 
     let extension = path.extension();
@@ -73,7 +73,7 @@ pub fn parse_dir(path: &Path) -> Vec<aggregate_report::feedback> {
             let entry = entry.unwrap();
             let path = entry.path();
             if !path.is_dir() {
-                // Only parse the path if is a file and not a directory.
+                // Only parse the path if it is a file and not a directory.
                 let result = parse(&path);
                 match result {
                     Ok(result) => results.push(result),
@@ -96,5 +96,22 @@ mod tests {
     #[test]
     fn test_parse_dir() {
         parse_dir(Path::new("./"));
+    }
+    #[test]
+    fn test_non_existent_dir() {
+        parse_dir(Path::new("./sample-data/non-existent-dir/"));
+    }
+    #[test]
+    fn test_parse_empty_dir() {
+        parse_dir(Path::new("./sample-data/emtpy-dir/"));
+    }
+    #[test]
+    fn test_parse_unreadable_dir() {
+        parse_dir(Path::new("./sample-data/unreadable-dir/"));
+    }
+    #[test]
+    fn test_error_when_parse_is_given_a_directory() {
+        let result = parse(Path::new("./sample-data/"));
+        assert!(result.is_err(), "{}", true);
     }
 }
