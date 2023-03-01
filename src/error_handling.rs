@@ -10,6 +10,6 @@ pub enum ParsingError {
     Zip(#[from] zip::result::ZipError),
     #[error("Unexpected file with extension {extension:?})")]
     UnknownFile { extension: std::string::String },
-    #[error("Cannot parse a directory. Use parse_dir()")]
-    ParseDirectory,
+    #[error("Cannot parse '{path_str}' as it is a directory. Use parse_dir()")]
+    ParseDirectory { path_str: std::string::String },
 }
