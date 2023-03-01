@@ -72,11 +72,13 @@ pub fn parse_dir(path: &Path) -> Vec<aggregate_report::feedback> {
         for entry in read_dir(path).unwrap() {
             let entry = entry.unwrap();
             let path = entry.path();
-
-            let result = parse(&path);
-            match result {
-                Ok(result) => results.push(result),
-                Err(error) => eprintln!("could not parse: {:?} because {:?}", path, error),
+            if !path.is_dir() {
+                // Only parse the path if is a file and not a directory.
+                let result = parse(&path);
+                match result {
+                    Ok(result) => results.push(result),
+                    Err(error) => eprintln!("could not parse: {:?} because {:?}", path, error),
+                }
             }
         }
     }
@@ -92,7 +94,6 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn test_parse_dir() {
         parse_dir(Path::new("./"));
     }
