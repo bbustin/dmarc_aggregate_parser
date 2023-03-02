@@ -32,11 +32,17 @@ pub fn parse<T: std::convert::AsRef<std::ffi::OsStr>>(
             }
             Some("gz") | Some("gzip") => {
                 let reader = get_file_reader(path)?;
-                let mut decoder = gzip::Decoder::new(reader)?;
+                let mut decoder = gzip::Decoder::new(reader).map_err(|e| ParsingError::Io {
+                    source: e,
+                    path: path.to_string_lossy().to_string(),
+                })?;
                 return parse_reader(&mut decoder);
             }
             Some("zip") => {
-                let file = File::open(path)?;
+                let file = File::open(path).map_err(|e| ParsingError::Io {
+                    source: e,
+                    path: path.to_string_lossy().to_string(),
+                })?;
                 let mut archive = zip::ZipArchive::new(file)?;
                 let mut file = archive.by_index(0)?;
                 return parse_reader(&mut file);
@@ -48,14 +54,20 @@ pub fn parse<T: std::convert::AsRef<std::ffi::OsStr>>(
         }
     }
 
-    let file = File::open(path)?;
+    let file = File::open(path).map_err(|e| ParsingError::Io {
+        source: e,
+        path: path.to_string_lossy().to_string(),
+    })?;
     let mut file = BufReader::new(file);
 
     parse_reader(&mut file)
 }
 
 fn get_file_reader(path: &Path) -> Result<BufReader<File>, ParsingError> {
-    let file = File::open(path)?;
+    let file = File::open(path).map_err(|e| ParsingError::Io {
+        source: e,
+        path: path.to_string_lossy().to_string(),
+    })?;
     Ok(BufReader::new(file))
 }
 
@@ -90,17 +102,48 @@ pub fn parse_dir(path: &Path) -> Vec<aggregate_report::feedback> {
 }
 
 #[cfg(test)]
-mod tests {
+mod parse {
     use super::*;
     #[test]
-    fn test_parse_single() {
-        parse(Path::new("./sample-data/dmarc.xml")).unwrap();
+    fn single_xml() {
+        let result = parse(Path::new("./sample-data/dmarc.xml")).unwrap();
+        assert_eq!(result.version, None);
+        assert_eq!(
+            result.report_metadata.email,
+            "postmaster@aol.com".to_string()
+        );
     }
     #[test]
-    fn test_unreadable_file() {
-        let result = parse(Path::new("./sample-data/dmarc-unreadable.xml"));
-        assert_eq!(result.unwrap_err().to_string(), "Cannot open file");
+    #[ignore = "Requires the existence of a file with read permissions removed. Can not be added to git."]
+    fn unreadable_xml() {
+        let result = parse(Path::new("./sample-data/unreadable.xml"));
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Cannot open file: './sample-data/unreadable.xml' Permission denied (os error 13)"
+        );
     }
+    #[test]
+    fn does_not_exist_xml() {
+        let result = parse(Path::new("./sample-data/no_such_file.xml"));
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Cannot open file: './sample-data/no_such_file.xml' No such file or directory (os error 2)"
+        );
+    }
+    #[test]
+    fn test_error_when_parse_is_given_a_directory() {
+        let result = parse(Path::new("./sample-data/"));
+        assert!(result.is_err(), "{}", true);
+        assert!(matches!(
+                result,
+            Err(ParsingError::ParseDirectory { path_str }) if path_str == "./sample-data/".to_string()
+        ));
+    }
+}
+#[cfg(test)]
+mod parse_dir {
+
+    use super::*;
 
     #[test]
     fn test_parse_dir() {
@@ -117,14 +160,5 @@ mod tests {
     #[test]
     fn test_parse_unreadable_dir() {
         parse_dir(Path::new("./sample-data/unreadable-dir/"));
-    }
-    #[test]
-    fn test_error_when_parse_is_given_a_directory() {
-        let result = parse(Path::new("./sample-data/"));
-        assert!(result.is_err(), "{}", true);
-        assert!(matches!(
-                    result,
-            Err(ParsingError::ParseDirectory { path_str }) if path_str == "./sample-data/".to_string()
-        ));
     }
 }
