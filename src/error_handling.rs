@@ -2,8 +2,11 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ParsingError {
-    #[error("Cannot open file")]
-    Io(#[from] std::io::Error),
+    #[error("Cannot open file: '{path}' {source}")]
+    Io {
+        source: std::io::Error,
+        path: String,
+    },
     #[error("Parsing error")]
     Parse(#[from] serde_xml_rs::Error),
     #[error("Error unpacking archive")]
