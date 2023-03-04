@@ -19,17 +19,18 @@ use std::path::Path;
 /// #Example:
 /// ```rust
 /// use dmarc_aggregate_parser::parse;
+/// # use std::path::Path;
 /// # let path = Path::new("./sample-data/dmarc.xml");
 /// let result = parse(path);
 /// assert!(result.is_ok(), true);
 /// if let Ok(result) = result {
-///     assert_eq!(result.unwrap().report_metadata.email,
+///     assert_eq!(result.report_metadata.email,
 ///                "postmaster@aol.com".to_string()
 ///             );
 /// }
 /// ```
 /// # Errors
-/// ParsingError::ParseDirectory will occur is a directory is passed.
+/// See [ParsingError]
 pub fn parse<T: std::convert::AsRef<std::ffi::OsStr>>(
     path: T,
 ) -> Result<aggregate_report::feedback, ParsingError> {

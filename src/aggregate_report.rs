@@ -28,15 +28,21 @@ pub struct ReportMetadataType {
 #[allow(non_camel_case_types)]
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum AlignmentType {
+    /// Relaxed
     r,
+    /// Strict
     s,
 }
 
 #[allow(non_camel_case_types)]
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum DispositionType {
+    /// There is no preference on how a failed DMARC should be handled.
     none,
+    /// The message should be quarantined. This usually means it will be placed in the `spam` folder
+    /// of the user
     quarantine,
+    /// The message should be regjected.
     reject,
 }
 
@@ -156,6 +162,7 @@ pub struct RecordType {
     pub auth_results: AuthResultType,
 }
 
+/// This struct contains all relevant information for a single DMARC Report
 #[allow(non_camel_case_types)]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct feedback {

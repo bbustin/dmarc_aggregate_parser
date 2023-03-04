@@ -3,7 +3,7 @@ use thiserror::Error;
 /// An enumeration of possible errors that might occur during the parsing event
 #[derive(Error, Debug)]
 pub enum ParsingError {
-    /// If there is IO error this eorror will be reported
+    /// If there is IO error this error will be returned
     #[error("Cannot open file: '{path}' {source}")]
     Io {
         /// Original source error from std::io::Error
