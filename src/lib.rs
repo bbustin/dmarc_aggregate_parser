@@ -1,4 +1,9 @@
+#![forbid(unsafe_code)]
+/*#![warn(missing_docs)]*/
 #![deny(missing_debug_implementations)]
+
+//! The DMARC Aggregate Parser is intended to provide a programmatical way to access information in an DMARC report.
+
 pub mod aggregate_report;
 pub mod error_handling;
 use error_handling::ParsingError;
@@ -11,8 +16,20 @@ use std::io::Read;
 use std::path::Path;
 
 /// This function takes a reference to a file to be parsed. If the file can not be parsed a [ParsingError] is returned.
+/// #Example:
+/// ```rust
+/// use dmarc_aggregate_parser::parse;
+/// # let path = Path::new("./sample-data/dmarc.xml");
+/// let result = parse(path);
+/// assert!(result.is_ok(), true);
+/// if let Ok(result) = result {
+///     assert_eq!(result.unwrap().report_metadata.email,
+///                "postmaster@aol.com".to_string()
+///             );
+/// }
+/// ```
 /// # Errors
-/// ParsingError::ParseDirectory will occur is a directory is passed. Use [parse_dir()]
+/// ParsingError::ParseDirectory will occur is a directory is passed.
 pub fn parse<T: std::convert::AsRef<std::ffi::OsStr>>(
     path: T,
 ) -> Result<aggregate_report::feedback, ParsingError> {
@@ -80,7 +97,10 @@ fn parse_reader(reader: &mut dyn Read) -> Result<aggregate_report::feedback, Par
 
 /// This function takes a directory path as an argument. If no dmarc report are found, an empty `Vec` is returned.
 /// Any subdirectories are ignored.
-/// Any files that can not be parsed will be reported stderr
+/// Any files that can not be parsed will be reported through STDERR
+/// # Note: Not suitable for production level use.
+/// This function is only really suitable for testing. You are advised to use [parse()] within your own directory
+/// processing code. In this way you can manage files as you wish.
 pub fn parse_dir(path: &Path) -> Vec<aggregate_report::feedback> {
     let mut results = Vec::new();
 
