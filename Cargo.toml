@@ -1,12 +1,14 @@
 [package]
 name = "dmarc_aggregate_parser"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Brian Bustin"]
 edition = "2018"
 description = "Simple library to parse email DMARC reports"
 repository = "https://github.com/bbustin/dmarc_aggregate_parser"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
+
+categories = ["data-structures", "email", "parser-implementations"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
